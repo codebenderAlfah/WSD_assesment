@@ -1,0 +1,22 @@
+{
+  "name": "wsd_assesment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codebenderAlfah/WSD_assesment.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codebenderAlfah/WSD_assesment/issues"
+  },
+  "homepage": "https://github.com/codebenderAlfah/WSD_assesment#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.54.1",
+    "@types/node": "^24.1.0"
+  }
+}
