@@ -11,9 +11,9 @@ The project follows a standard structure for Playwright test automation framewor
 ```
 .
 ├── pages/
-│   └── home_page.ts
+│   └── flight_page.ts
 ├── tests/
-│   └── airfarecomparison.spec.ts
+│   └── searchFlights.spec.ts
 ├── .gitignore
 ├── package.json
 ├── package-lock.json

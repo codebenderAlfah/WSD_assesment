@@ -1,21 +1,21 @@
 import {expect, Locator, Page} from "@playwright/test";
 
-export default class HomePage {
+export default class FlightPage {
     readonly page: Page;
     readonly fromInput: Locator;
     readonly toInput: Locator;
-    readonly fromSelector;
-    readonly toSelector;
+    readonly fromSelector: Locator;
+    readonly toSelector: Locator;
     readonly departureDateSelector: Locator;
     readonly nextMonthButton: Locator;
-    readonly monthName;
+    readonly monthName: Locator;
     readonly date: Locator;
-    readonly travellerSelector;
+    readonly travellerSelector: Locator;
     readonly travellerAddButton: Locator;
     readonly cabinClassSelector: Locator;
+    readonly selectedCabinClass: Locator;
     readonly searchFlightButton: Locator;
-    readonly usBangladeshAirlinesFilter;
-    readonly novoaAirlinesFilter;
+    readonly searchResults: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -25,12 +25,14 @@ export default class HomePage {
         this.toSelector = this.page.getByText('Dhaka, Bangladesh');
         this.departureDateSelector = this.page.getByTestId('departure-date-input-form-1').locator('button');
         this.nextMonthButton = this.page.getByLabel('Next Month');
-        this.monthName = this.page.getByText('September 2025');
+        this.monthName = this.page.locator('//div[@class=\'react-datepicker__current-month\']');
         this.date = this.page.getByLabel('Choose Tuesday, September 23rd,');
         this.travellerSelector = this.page.getByText('1 Traveller');
         this.travellerAddButton = this.page.getByTestId('adult-number-add-button');
         this.cabinClassSelector = this.page.getByAltText('cabin_class_radio_1');
+        this.selectedCabinClass = this.page.locator('//p[@class=\'truncate text-sm text-brand-7\']');
         this.searchFlightButton = this.page.getByTestId('search-flight-button');
+        this.searchResults = this.page.getByTestId('flight_card_1');
     }
 
     async clickFromInput() {
@@ -70,25 +72,19 @@ export default class HomePage {
     async clickDate() {
         await this.date.click();
     }
-    async checkMonthName(): Promise<boolean> {
-        try {
-            await expect(this.monthName).toBeVisible();
-            return true;
-        } catch {
-            return false;
-        }
-    }
 
     async selectDepartureDate() {
         await this.clickDepartureDate();
 
-        let isSeptember = await this.checkMonthName();
-        while (!isSeptember) {
+        let value = await this.monthName.innerText();
+        if (value !== 'September 2025') {
             await this.clickNextMonthButton();
-            isSeptember = await this.checkMonthName();
         }
-
         await this.clickDate();
+    }
+
+    async verifyDepartureDate() {
+        await expect(this.page.getByText('23 Sep, 2025')).toBeVisible();
     }
 
     async clickTravellerSelector() {
@@ -100,7 +96,13 @@ export default class HomePage {
 
     async selectTraveller() {
         await this.clickTravellerSelector();
-        await this.clickTravellerAddButton();
+        let count = await this.travellerAddButton.locator('xpath=./preceding-sibling::p[1]').textContent();
+        if( count !== '2') {
+            await this.clickTravellerAddButton();
+        }
+    }
+    async verifyTravellerCount() {
+        await expect(this.page.getByText('2 Travellers')).toBeVisible();
     }
 
     async clickCabinClassSelector() {
@@ -108,6 +110,10 @@ export default class HomePage {
     }
     async selectCabinClass() {
         await this.clickCabinClassSelector();
+    }
+
+    async verifyCabinClass() {
+        await expect(this.selectedCabinClass).toHaveText('Economy/Premium Economy');
     }
 
     async clickSearchFlightButton() {
@@ -119,6 +125,7 @@ export default class HomePage {
     }
 
     async verifySearchResults() {
-        await expect(this.searchFlightButton).toHaveValue('modify search');
+    await this.searchResults.waitFor({ state: 'visible' });
+    await expect(this.searchResults).toBeVisible();
     }
 }
